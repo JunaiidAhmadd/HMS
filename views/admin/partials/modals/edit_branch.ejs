@@ -1,0 +1,44 @@
+<div class="modal fade" id="editBranchModal-<%= branch._id %>" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-md">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Branch</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <form action="/admin/branches/<%= branch._id %>/update" method="POST" enctype="multipart/form-data">
+        <div class="modal-body">
+
+          <div class="mb-3">
+            <label class="form-label">Branch Name</label>
+            <input type="text" name="name" class="form-control" value="<%= branch.name %>" required />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Address</label>
+            <textarea name="address" class="form-control" rows="2" required><%= branch.address %></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Facilities</label>
+            <input type="text" name="facilities" class="form-control" value="<%= branch.facilities.join(', ') %>" required />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Upload New Photos (optional)</label>
+            <input type="file" name="photos" class="form-control" multiple />
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>

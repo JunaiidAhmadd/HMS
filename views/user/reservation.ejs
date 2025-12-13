@@ -1,0 +1,198 @@
+<%- include("partials/user_header", { pageTitle: "Reservation Form – Hostel Management" }) %>
+
+  <body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <%- include("partials/user_navbar") %>
+
+      <div class="container py-5">
+        <h1 class="text-3xl font-semibold mb-4">
+          <i class="bi bi-journal-plus me-2"></i> Reservation Form
+        </h1>
+
+        <!-- FORM SUBMITS TO BACKEND -->
+        <form action="/user/reservation" method="POST">
+
+          <!-- PERSONAL INFORMATION -->
+          <div class="card shadow-sm mb-4 border-0 rounded-3">
+            <div class="card-header bg-primary text-white fw-bold">
+              <i class="bi bi-person-lines-fill me-2"></i> Personal Information
+            </div>
+
+            <div class="card-body grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-control" name="fullName" value="<%= user ? user.fullName : '' %>"
+                  readonly>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email" value="<%= user ? user.email : '' %>" readonly>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Phone</label>
+                <input type="tel" class="form-control" name="phone" class="form-control"
+                  value="<%= user ? user.phone : '' %>" readonly />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">CNIC</label>
+                <input type="text" name="cnic" class="form-control" required />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Occupation</label>
+                <select name="occupation" id="occupation" class="form-select" required>
+                  <option value="">Select Occupation</option>
+                  <option value="Student">Student</option>
+                  <option value="Jobian">Jobian</option>
+                  <option value="Visitor">Visitor</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- STUDENT SECTION -->
+          <div id="studentFields" class="card shadow-sm mb-4 border-0 rounded-3 d-none">
+            <div class="card-header bg-primary text-white fw-bold">
+              <i class="bi bi-mortarboard me-2"></i> Student Information
+            </div>
+
+            <div class="card-body grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              <div class="mb-3">
+                <label class="form-label">Student ID</label>
+                <input type="text" name="studentId" class="form-control" />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Semester</label>
+                <select name="semester" class="form-select">
+                  <option value="">Select Semester</option>
+                  <% for(let i=1; i<=8; i++){ %>
+                    <option>
+                      <%= i %> Semester
+                    </option>
+                    <% } %>
+                </select>
+              </div>
+
+              <div class="mb-3 md:col-span-2">
+                <label class="form-label">Institute/University</label>
+                <input type="text" name="institute" class="form-control" />
+              </div>
+
+            </div>
+          </div>
+
+          <!-- BOOKING INFORMATION -->
+          <div class="card shadow-sm mb-4 border-0 rounded-3">
+            <div class="card-header bg-primary text-white fw-bold">
+              <i class="bi bi-building-check me-2"></i> Booking Information
+            </div>
+
+            <div class="card-body grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              <!-- Branch -->
+              <div class="mb-3">
+                <label class="form-label">Select Branch</label>
+                <select name="branchId" id="branchSelect" class="form-select" required>
+                  <option value="">Select Branch</option>
+                  <% branches.forEach(b=> { %>
+                    <option value="<%= b._id %>">
+                      <%= b.name %>
+                    </option>
+                    <% }) %>
+                </select>
+              </div>
+
+              <!-- Room Type -->
+              <div class="mb-3">
+                <label class="form-label">Room Type</label>
+                <select name="roomType" id="roomTypeSelect" class="form-select" required>
+                  <option value="">Select Room Type</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Number of Occupants</label>
+                <input type="number" name="occupants" class="form-control" min="1" max="7" required />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Start Date</label>
+                <input type="date" name="startDate" class="form-control" required />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Duration (Months)</label>
+                <select name="durationMonths" class="form-select" required>
+                  <option value="">Select Duration</option>
+                  <% for(let i=1; i<=12; i++){ %>
+                    <option value="<%= i %>">
+                      <%= i %> Month
+                    </option>
+                    <% } %>
+                </select>
+              </div>
+
+              <div class="mb-3 md:col-span-2">
+                <label class="form-label">Additional Notes</label>
+                <textarea name="notes" class="form-control" rows="3"></textarea>
+              </div>
+
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary px-4 py-2 fw-bold">
+            <i class="bi bi-check-circle me-1"></i> Submit Reservation
+          </button>
+
+        </form>
+      </div>
+
+      <!-- Footer -->
+      <%- include("partials/user_footer") %>
+
+        <!-- JS LOGIC -->
+        <script id="rooms-data" type="application/json">
+          <%- JSON.stringify(roomsByBranch) %>
+        </script>
+        <script>
+
+          // Show / hide student section
+          document.getElementById("occupation").addEventListener("change", function () {
+            document.getElementById("studentFields")
+              .classList.toggle("d-none", this.value !== "Student");
+          });
+
+          // Rooms grouped by branch (backend data injected safely)
+          const roomsDataElement = document.getElementById('rooms-data');
+          const roomsByBranch = roomsDataElement ? JSON.parse(roomsDataElement.textContent) : {};
+          console.log("Client roomsByBranch:", roomsByBranch);
+
+          // Branch → RoomType
+          document.getElementById("branchSelect").addEventListener("change", function () {
+            const branchId = this.value;
+            const roomSelect = document.getElementById("roomTypeSelect");
+
+            roomSelect.innerHTML = `<option value="">Select Room Type</option>`;
+
+            if (roomsByBranch[branchId]) {
+              roomsByBranch[branchId].forEach(type => {
+                roomSelect.innerHTML += `<option value="${type}">${type}</option>`;
+              });
+            }
+          });
+
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  </body>
+
+  </html>

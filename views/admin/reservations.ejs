@@ -1,0 +1,372 @@
+<%- include("partials/admin_header", { pageTitle: "Reservation Management" }) %>
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    .admin-wrapper {
+      display: flex;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #sidebar {
+      width: 250px;
+      height: 100vh;
+      overflow: hidden !important;
+      position: sticky;
+      top: 0;
+      left: 0;
+      background: #13192f;
+    }
+
+    .flex-grow-1 {
+      flex-grow: 1;
+      height: 100vh;
+      overflow-y: auto;
+      background-color: #f8f9fa;
+    }
+
+    @media (max-width: 768px) {
+      #sidebar {
+        position: fixed;
+        left: -260px;
+        transition: 0.3s ease;
+        z-index: 1200;
+      }
+
+      #sidebar.active {
+        left: 0;
+      }
+    }
+
+    .table thead {
+      background-color: #1b1e24;
+      color: white !important;
+    }
+
+    .mobile-card {
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      border: 1px solid #dee2e6;
+      margin-bottom: 15px;
+    }
+
+    .badge.bg-warning {
+      background-color: #ffc107 !important;
+      color: #000;
+    }
+
+    .badge.bg-success {
+      background-color: #28a745 !important;
+    }
+
+    .badge.bg-danger {
+      background-color: #dc3545 !important;
+    }
+
+    .modal-header {
+      background-color: #1b1e24;
+      color: white;
+    }
+
+    .search-bar {
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: 1px solid #d1d1d1;
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+  </style>
+
+
+  <div id="sidebarOverlay"></div>
+
+  <div class="admin-wrapper">
+
+    <%- include("partials/admin_sidebar", { activePage: "reservations" }) %>
+
+      <div class="flex-grow-1">
+
+        <header class="d-none d-md-flex justify-content-between align-items-center bg-white shadow-sm py-3 px-4">
+          <h5 class="fw-bold m-0">Reservation Management</h5>
+          <div class="d-flex align-items-center gap-2">
+            <span>Admin</span>
+            <i class="bi bi-person-circle fs-4"></i>
+          </div>
+        </header>
+
+        <main class="p-4">
+
+          <h4 class="fw-bold mb-4">All Reservations</h4>
+
+          <!-- 🔍 SEARCH & FILTER -->
+          <div class="d-flex gap-2 mb-4">
+            <input type="text" id="searchInput" class="search-bar mb-0"
+              placeholder="Search by name, email, branch, room, status...">
+
+            <select id="branchFilter" class="form-select w-auto" style="min-width: 150px;">
+              <option value="">All Branches</option>
+              <% if (typeof branches !=='undefined' && branches.length> 0) { %>
+                <% branches.forEach(b=> { %>
+                  <option value="<%= b.name %>">
+                    <%= b.name %>
+                  </option>
+                  <% }) %>
+                    <% } %>
+            </select>
+          </div>
+
+          <% if (typeof success !=="undefined" && success) { %>
+            <div class="alert alert-success">
+              <%= success %>
+            </div>
+            <% } %>
+
+              <% if (typeof error !=="undefined" && error) { %>
+                <div class="alert alert-danger">
+                  <%= error %>
+                </div>
+                <% } %>
+
+
+                  <!-- DESKTOP TABLE -->
+                  <div class="card shadow-sm d-none d-md-block" style="border-radius: 12px">
+                    <div class="table-responsive" style="border-radius: 12px">
+                      <table class="table table-hover align-middle mb-0" id="reservationTable"
+                        style="border-radius: 12px">
+                        <thead class="table-dark">
+                          <tr>
+                            <th>Name</th>
+                            <th>Occupation</th>
+                            <th>Student Info</th>
+                            <th>Branch</th>
+                            <th>Room Type</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th class="text-center">Actions</th>
+                          </tr>
+                        </thead>
+
+                        <tbody id="tableBody">
+                          <% reservations.forEach(item=> { %>
+                            <tr class="search-row" data-branch="<%= item.branchName %>">
+                              <td>
+                                <%= item.fullName %>
+                              </td>
+                              <td>
+                                <%= item.occupation %>
+                              </td>
+                              <td>
+                                <% if (item.occupation==="Student" ) { %>
+                                  <div class="small text-muted">
+                                    ID: <%= item.studentId %> |
+                                      Sem: <%= item.semester %> |
+                                        Inst: <%= item.institute %>
+                                  </div>
+                                  <% } else { %>
+                                    <span class="text-muted small">Not a student</span>
+                                    <% } %>
+                              </td>
+                              <td>
+                                <%= item.branchName %>
+                              </td>
+                              <td>
+                                <%= item.roomType %>
+                              </td>
+                              <td>
+                                <%= new Date(item.createdAt).toLocaleDateString() %>
+                              </td>
+                              <td>
+                                <%= item.status %>
+                              </td>
+                              <td class="text-center">
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                  data-bs-target="#viewRes-<%= item._id %>">
+                                  <i class="bi bi-eye"></i>
+                                </button>
+                              </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+
+                      </table>
+                    </div>
+                  </div>
+
+
+                  <!-- ======================= -->
+                  <!-- MOBILE TABLE (Improved) -->
+                  <!-- ======================= -->
+                  <div class="d-md-none">
+
+                    <div class="card shadow-sm border-0 mb-3" style="border-radius: 12px; overflow: hidden;">
+
+                      <table class="table table-sm mb-0" style="border-collapse: separate; width: 100%;">
+
+                        <!-- Blue Header -->
+                        <thead class="bg-blue-600">
+                          <tr>
+                            <th style="border: none; padding: 10px;">Name</th>
+                            <th style="border: none; width: 80px; text-align: right; padding: 10px;">Action</th>
+                          </tr>
+                        </thead>
+
+                        <tbody id="mobileTableBody" style="background: white;">
+                          <% reservations.forEach(item=> { %>
+
+                            <tr class="search-row" data-branch="<%= item.branchName %>"
+                              style="border-bottom: 1px solid #e0e0e0;">
+                              <td class="align-middle" style="padding: 10px;">
+                                <strong style="display:block;">
+                                  <%= item.fullName %>
+                                </strong>
+                                <% if (item.status==="Approved" ) { %>
+                                  <span class="badge bg-success" style="font-size: 0.75rem;">Approved</span>
+                                  <% } else if (item.status==="Pending" ) { %>
+                                    <span class="badge bg-warning text-dark" style="font-size: 0.75rem;">Pending</span>
+                                    <% } else { %>
+                                      <span class="badge bg-danger" style="font-size: 0.75rem;">Rejected</span>
+                                      <% } %>
+                              </td>
+
+                              <td style="text-align: right; padding: 10px; vertical-align: middle;">
+                                <button class="btn btn-primary btn-sm"
+                                  style="white-space: nowrap; padding: 0.35rem 0.6rem; font-size: 0.78rem;"
+                                  data-bs-toggle="modal" data-bs-target="#viewRes-<%= item._id %>">
+                                  View
+                                </button>
+                              </td>
+                            </tr>
+
+                            <% }) %>
+                        </tbody>
+
+                      </table>
+
+                    </div>
+
+                  </div>
+
+
+
+
+
+                  <!-- MODALS -->
+                  <% reservations.forEach(item=> { %>
+                    <div class="modal fade" id="viewRes-<%= item._id %>" tabindex="-1">
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+
+                          <div class="modal-header">
+                            <h5 class="modal-title">Reservation Details</h5>
+                            <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                          </div>
+
+                          <div class="modal-body">
+
+                            <strong>Name</strong>
+                            <div>
+                              <%= item.fullName %>
+                            </div>
+
+                            <strong>Occupation</strong>
+                            <div>
+                              <%= item.occupation %>
+                            </div>
+
+                            <% if (item.occupation==="Student" ) { %>
+                              <strong>Student ID</strong>
+                              <div>
+                                <%= item.studentId %>
+                              </div>
+                              <strong>Semester</strong>
+                              <div>
+                                <%= item.semester %>
+                              </div>
+                              <strong>Institute</strong>
+                              <div>
+                                <%= item.institute %>
+                              </div>
+                              <% } %>
+
+                                <strong>Branch</strong>
+                                <div>
+                                  <%= item.branchName %>
+                                </div>
+
+                                <strong>Room Type</strong>
+                                <div>
+                                  <%= item.roomType %>
+                                </div>
+
+                                <strong>Date</strong>
+                                <div>
+                                  <%= new Date(item.createdAt).toLocaleDateString() %>
+                                </div>
+
+                                <strong>Status</strong>
+                                <div>
+                                  <%= item.status %>
+                                </div>
+
+                          </div>
+
+                          <div class="modal-footer">
+
+                            <% if (item.status==="Pending" ) { %>
+                              <form action="/admin/reservations/<%= item._id %>/approve" method="POST">
+                                <button class="btn btn-success">Approve</button>
+                              </form>
+
+                              <form action="/admin/reservations/<%= item._id %>/reject" method="POST">
+                                <button class="btn btn-danger">Reject</button>
+                              </form>
+                              <% } %>
+
+                                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+                    <% }) %>
+
+        </main>
+
+      </div>
+  </div>
+
+
+  <!-- 🔍 LIVE SEARCH SCRIPT -->
+  <script>
+    function filterTable() {
+      let search = document.getElementById("searchInput").value.toLowerCase();
+      let branch = document.getElementById("branchFilter").value.toLowerCase();
+      let rows = document.querySelectorAll(".search-row");
+
+      rows.forEach(row => {
+        let txt = row.innerText.toLowerCase();
+        let rowBranch = (row.getAttribute("data-branch") || "").toLowerCase();
+
+        let matchesSearch = txt.includes(search);
+        let matchesBranch = branch === "" || rowBranch === branch;
+
+        row.style.display = matchesSearch && matchesBranch ? "" : "none";
+      });
+    }
+
+    document.getElementById("searchInput").addEventListener("keyup", filterTable);
+    document.getElementById("branchFilter").addEventListener("change", filterTable);
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

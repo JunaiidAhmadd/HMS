@@ -1,0 +1,132 @@
+<%- include("partials/admin_header", { pageTitle: "Pricing Management" }) %>
+
+<body class="min-vh-100 flex flex-col md:flex-row bg-light">
+
+  <div id="sidebarOverlay"></div>
+
+  <!-- Sidebar -->
+  <%- include("partials/admin_sidebar", { activePage: "pricing" }) %>
+
+  <!-- Main Content -->
+  <div class="flex-grow-1">
+
+    <!-- Desktop Header -->
+    <header class="hidden md:flex items-center justify-between bg-white shadow-sm py-3 px-4">
+      <h5 class="m-0">Pricing Management</h5>
+      <div class="flex items-center gap-2">
+        <span>Admin</span>
+        <i class="bi bi-person-circle fs-4"></i>
+      </div>
+    </header>
+
+    <!-- Body -->
+    <main class="p-4">
+
+      <h4 class="fw-bold mb-4">Update Room Pricing</h4>
+
+      <!-- Success Message -->
+      <% if (typeof success !== "undefined") { %>
+        <div class="alert alert-success"><%= success %></div>
+      <% } %>
+
+      <!-- Error Message -->
+      <% if (typeof error !== "undefined") { %>
+        <div class="alert alert-danger"><%= error %></div>
+      <% } %>
+
+      <div class="card shadow-sm p-4" style="max-width: 650px;">
+
+        <!-- Form -->
+        <form action="/admin/pricing" method="POST">
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">1-Seater Price (PKR)</label>
+            <input 
+              type="number"
+              name="single"
+              value="<%= pricing.single %>"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">2-Seater Price (PKR)</label>
+            <input 
+              type="number"
+              name="double"
+              value="<%= pricing.double %>"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">3-Seater Price (PKR)</label>
+            <input 
+              type="number"
+              name="three"
+              value="<%= pricing.three %>"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">4-Seater Price (PKR)</label>
+            <input 
+              type="number"
+              name="four"
+              value="<%= pricing.four %>"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">5-Seater Price (PKR)</label>
+            <input 
+              type="number"
+              name="five"
+              value="<%= pricing.five %>"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">6-Seater Price (PKR)</label>
+            <input 
+              type="number"
+              name="six"
+              value="<%= pricing.six %>"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">7-Seater Price (PKR)</label>
+            <input 
+              type="number"
+              name="seven"
+              value="<%= pricing.seven %>"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <button class="btn btn-primary w-100 py-2 fw-bold">
+            <i class="bi bi-save me-1"></i> Save Pricing
+          </button>
+
+        </form>
+
+      </div>
+
+    </main>
+
+  </div>
+
+</body>
+</html>

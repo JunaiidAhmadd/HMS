@@ -1,0 +1,217 @@
+<%- include("partials/admin_header", { pageTitle: "Rent Payments" }) %>
+
+  <body class="min-vh-100 flex flex-col md:flex-row bg-light">
+
+    <div id="sidebarOverlay"></div>
+    <%- include("partials/admin_sidebar", { activePage: "residents" }) %>
+
+      <div class="flex-grow-1">
+
+        <header class="bg-white shadow-sm py-3 px-4 d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-2">
+            <h5 class="m-0">Rent History</h5>
+          </div>
+
+          <div class="d-flex items-center gap-3">
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addPaymentModal">
+              <i class="bi bi-plus-lg"></i> Add Payment
+            </button>
+            <div class="d-flex items-center gap-2">
+              <span class="d-none d-sm-inline">Admin</span>
+              <i class="bi bi-person-circle fs-4"></i>
+            </div>
+          </div>
+        </header>
+
+        <main class="p-3 p-md-4">
+
+          <div class="mb-3">
+            <h4 class="fw-bold">
+              <%= residentName || "Unknown Resident" %>
+            </h4>
+          </div>
+
+          <div class="card shadow-sm d-none d-md-block">
+            <div class="card-body">
+              <div class="table-responsive" style="border-radius: 12px">
+                <table class="table table-striped align-middle table-bordered" style="border-radius: 12px">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>Month</th>
+                      <th>Year</th>
+                      <th>Amount</th>
+                      <th>Method</th>
+                      <th>Screenshot</th>
+                      <th>Status</th>
+                      <th class="text-center">Confirm</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (!payments || payments.length===0) { %>
+                      <tr>
+                        <td colspan="7" class="text-center">No payments found.</td>
+                      </tr>
+                      <% } %>
+
+                        <% payments.forEach(p=> { %>
+                          <tr>
+                            <td>
+                              <%= p.monthName %>
+                            </td>
+                            <td>
+                              <%= p.year %>
+                            </td>
+                            <td class="fw-semibold">PKR <%= p.amount.toLocaleString() %>
+                            </td>
+                            <td class="text-capitalize">
+                              <%= p.method %>
+                            </td>
+                            <td>
+                              <% if (p.method==="online" && p.screenshot) { %>
+                                <a href="<%= p.screenshot %>" target="_blank"
+                                  class="btn btn-sm btn-outline-primary">View</a>
+                                <% } else { %>
+                                  <span class="text-muted">—</span>
+                                  <% } %>
+                            </td>
+                            <td>
+                              <% if (p.status==="Confirmed" ) { %>
+                                <span class="badge bg-success">Confirmed</span>
+                                <% } else { %>
+                                  <span class="badge bg-warning text-dark">Pending</span>
+                                  <% } %>
+                            </td>
+                            <td class="text-center">
+                              <% if (p.status !=="Confirmed" ) { %>
+                                <form action="/admin/residents/<%= p.reservationId %>/payments/<%= p._id %>/confirm"
+                                  method="POST">
+                                  <button class="btn btn-success btn-sm">
+                                    <i class="bi bi-check-circle me-1"></i> Confirm
+                                  </button>
+                                </form>
+                                <% } else { %>
+                                  <span class="text-success fs-4 fw-bold">✓</span>
+                                  <% } %>
+                            </td>
+                          </tr>
+                          <% }) %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-block d-md-none">
+
+            <% if (!payments || payments.length===0) { %>
+              <div class="alert alert-secondary text-center">No payments found.</div>
+              <% } %>
+
+                <% payments.forEach(p=> { %>
+                  <div class="card shadow-sm mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                      <strong class="text-primary">
+                        <%= p.monthName %>
+                          <%= p.year %>
+                      </strong>
+                      <% if (p.status==="Confirmed" ) { %>
+                        <span class="badge bg-success">Confirmed</span>
+                        <% } else { %>
+                          <span class="badge bg-warning text-dark">Pending</span>
+                          <% } %>
+                    </div>
+
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Amount:</span>
+                        <span class="fw-bold fs-5">PKR <%= p.amount.toLocaleString() %></span>
+                      </div>
+
+                      <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Method:</span>
+                        <span class="text-capitalize">
+                          <%= p.method %>
+                        </span>
+                      </div>
+
+                      <div class="d-flex gap-2">
+                        <% if (p.method==="online" && p.screenshot) { %>
+                          <a href="<%= p.screenshot %>" target="_blank" class="btn btn-outline-primary flex-grow-1">
+                            <i class="bi bi-image"></i> Proof
+                          </a>
+                          <% } %>
+
+                            <% if (p.status !=="Confirmed" ) { %>
+                              <form action="/admin/residents/<%= p.reservationId %>/payments/<%= p._id %>/confirm"
+                                method="POST" class="flex-grow-1">
+                                <button class="btn btn-success w-100">
+                                  <i class="bi bi-check-circle"></i> Confirm
+                                </button>
+                              </form>
+                              <% } else { %>
+                                <button class="btn btn-light text-success flex-grow-1" disabled>
+                                  <i class="bi bi-check-all"></i> Verified
+                                </button>
+                                <% } %>
+                      </div>
+                    </div>
+                  </div>
+                  <% }) %>
+          </div>
+
+        </main>
+
+      </div>
+
+      <!-- Add Payment Modal -->
+      <div class="modal fade" id="addPaymentModal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form action="/admin/residents/payments/add-cash" method="POST">
+              <div class="modal-header">
+                <h5 class="modal-title">Add Manual Payment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <input type="hidden" name="reservationId" value="<%= reservation._id %>">
+                <input type="hidden" name="userId"
+                  value="<%= reservation.userId ? reservation.userId._id : reservation.userId %>">
+
+                <div class="mb-3">
+                  <label class="form-label">Month</label>
+                  <select name="month" class="form-select" required>
+                    <% const months=["January", "February" , "March" , "April" , "May" , "June" , "July" , "August"
+                      , "September" , "October" , "November" , "December" ]; %>
+                      <% months.forEach((m, index)=> { %>
+                        <option value="<%= index + 1 %>" <%=(new Date().getMonth()===index) ? 'selected' : '' %>><%= m
+                            %>
+                        </option>
+                        <% }) %>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Year</label>
+                  <input type="number" name="year" class="form-control" value="<%= new Date().getFullYear() %>"
+                    required>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Amount (PKR)</label>
+                  <input type="number" name="amount" class="form-control" value="<%= reservation.price %>" required>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Add Payment</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+
+  </html>

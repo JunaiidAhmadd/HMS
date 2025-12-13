@@ -1,0 +1,293 @@
+<%- include("partials/admin_header", { pageTitle: "Room Management" }) %>
+
+<style>
+  /* GLOBAL CLEAN LAYOUT (MATCHES DASHBOARD + BRANCHES)  */
+  body {
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .admin-wrapper {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Fixed Sidebar */
+  #sidebar {
+    width: 250px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    left: 0;
+    overflow-y: hidden !important;
+  }
+
+  /* Main Content Area */
+  .flex-grow-1 {
+    flex-grow: 1;
+    height: 100vh;
+    overflow-y: auto;
+    width: 100%;
+    background-color: #f8f9fa;
+  }
+
+  /* MOBILE: Sidebar overlay behavior */
+  @media (max-width: 768px) {
+    #sidebar {
+      position: fixed;
+      left: -260px;
+      transition: 0.3s ease;
+      z-index: 1200;
+    }
+    #sidebar.active {
+      left: 0;
+    }
+  }
+
+  /* Table Header */
+  .table thead {
+    background-color: #1b1e24;
+    color: white;
+  }
+
+  .mobile-card {
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 15px;
+    background: white;
+    margin-bottom: 15px;
+  }
+
+  .badge.bg-info {
+    background-color: #0dcaf0 !important;
+    color: black !important;
+    padding: 5px 10px;
+    border-radius: 12px;
+  }
+
+  /* Mobile Action Buttons */
+  .mobile-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .mobile-actions button {
+    flex: 1 !important;
+  }
+</style>
+
+<div id="sidebarOverlay"></div>
+
+<div class="admin-wrapper">
+
+  <!-- FIXED SIDEBAR -->
+  <%- include("partials/admin_sidebar", { activePage: "rooms" }) %>
+
+  <!-- MAIN CONTENT -->
+  <div class="flex-grow-1">
+
+    <!-- Desktop Header -->
+    <header class="d-none d-md-flex justify-content-between align-items-center bg-white shadow-sm py-3 px-4">
+      <h5 class="fw-bold m-0">Room Management</h5>
+      <div class="d-flex align-items-center gap-2">
+        <span>Admin</span>
+        <i class="bi bi-person-circle fs-4"></i>
+      </div>
+    </header>
+
+    <!-- Main Section -->
+    <main class="p-4">
+
+      <!-- Flash Messages -->
+      <% if (success) { %>
+        <div class="alert alert-success alert-dismissible fade show">
+          <%= success %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      <% } %>
+
+      <% if (error) { %>
+        <div class="alert alert-danger alert-dismissible fade show">
+          <%= error %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      <% } %>
+
+      <!-- Header + Add Room Button -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold">All Rooms</h5>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRoomModal">
+          <i class="bi bi-plus"></i> Add Room
+        </button>
+      </div>
+
+      <!-- Filter by Branch -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <form action="/admin/rooms" method="GET">
+            <label class="form-label fw-semibold">Filter by Branch</label>
+            <select class="form-select" name="branchId" onchange="this.form.submit()">
+              <option value="">All Branches</option>
+              <% branches.forEach(b => { %>
+                <option value="<%= b._id %>" <%= branchId == b._id ? "selected" : "" %>>
+                  <%= b.name %>
+                </option>
+              <% }) %>
+            </select>
+          </form>
+        </div>
+      </div>
+
+      <!-- ============================
+           DESKTOP TABLE VIEW (HYBRID)
+      =============================== -->
+      <div class="card shadow-sm d-none d-md-block" style="border-radius: 12px">
+        <div class="table-responsive" style="border-radius: 12px">
+          <table class="table table-striped table-hover align-middle mb-0" style="border-radius: 12px">
+            <thead class="table-dark">
+              <tr>
+                <th>Branch</th>
+                <th>Type</th>
+                <th>Capacity</th>
+                <th>Facilities</th>
+                <th>Price</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <% if (rooms && rooms.length > 0) { %>
+
+                <% rooms.forEach(r => { %>
+                  <tr>
+                    <td class="fw-semibold"><%= r.branchName %></td>
+                    <td><%= r.type %></td>
+                    <td><%= r.capacity %> Persons</td>
+                    <td>
+                      <div class="d-flex flex-wrap gap-1">
+                        <% r.facilities.forEach(f => { %>
+                          <span class="badge bg-info"><%= f %></span>
+                        <% }) %>
+                      </div>
+                    </td>
+                    <td><strong>PKR <%= r.price.toLocaleString() %></strong></td>
+
+                    <td class="text-center">
+                      <button class="btn btn-sm btn-outline-primary"
+                              data-bs-toggle="modal"
+                              data-bs-target="#editRoomModal-<%= r._id %>">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+
+                      <form action="/admin/rooms/<%= r._id %>/delete"
+                            method="POST"
+                            class="d-inline-block"
+                            onsubmit="return confirm('Delete this room?')">
+
+                        <button class="btn btn-sm btn-outline-danger">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }) %>
+
+              <% } else { %>
+                <tr>
+                  <td colspan="6" class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox fs-1"></i>
+                    <p class="mt-2">No rooms found.</p>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============================
+           MOBILE CARD VIEW
+      =============================== -->
+      <div class="d-block d-md-none">
+
+        <% if (rooms && rooms.length > 0) { %>
+
+          <% rooms.forEach(r => { %>
+
+            <div class="mobile-card shadow-sm">
+
+              <div class="d-flex justify-content-between mb-2">
+                <h6 class="fw-bold m-0"><%= r.type %></h6>
+                <span class="badge bg-success">PKR <%= r.price.toLocaleString() %></span>
+              </div>
+
+              <p class="text-muted mb-1">
+                <i class="bi bi-building"></i> <%= r.branchName %>
+              </p>
+
+              <p class="text-muted mb-2">
+                <i class="bi bi-people"></i> <%= r.capacity %> Persons
+              </p>
+
+              <small class="text-muted d-block">Facilities:</small>
+              <div class="d-flex flex-wrap gap-1 mb-2">
+                <% r.facilities.forEach(f => { %>
+                  <span class="badge bg-info"><%= f %></span>
+                <% }) %>
+              </div>
+
+              <div class="mobile-actions">
+                <button class="btn btn-primary btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editRoomModal-<%= r._id %>">
+                  <i class="bi bi-pencil"></i> Edit
+                </button>
+
+                <form action="/admin/rooms/<%= r._id %>/delete"
+                      method="POST"
+                      style="flex:1"
+                      onsubmit="return confirm('Delete this room?')">
+                  <button class="btn btn-danger btn-sm w-100">
+                    <i class="bi bi-trash"></i> Delete
+                  </button>
+                </form>
+              </div>
+
+            </div>
+
+          <% }) %>
+
+        <% } else { %>
+
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-inbox fs-1"></i>
+            <p>No rooms found.</p>
+          </div>
+
+        <% } %>
+
+      </div>
+
+      <!-- ======================
+           ADD ROOM MODAL
+      ======================== -->
+      <%- include("partials/modals/add_room") %>
+
+      <!-- ======================
+           EDIT ROOM MODALS
+      ======================== -->
+      <% rooms.forEach(r => { %>
+        <%- include("partials/modals/edit_room", { room: r }) %>
+      <% }) %>
+
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

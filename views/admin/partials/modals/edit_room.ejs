@@ -1,0 +1,67 @@
+<!-- EDIT ROOM MODAL -->
+<div class="modal fade" id="editRoomModal-<%= room._id %>" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+
+    <form action="/admin/rooms/<%= room._id %>?_method=PUT" method="POST" class="modal-content">
+
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Edit Room</h5>
+        <button type="button" class="btn-close bg-light" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Branch -->
+        <div class="mb-3">
+          <label class="form-label">Branch</label>
+          <select name="branchId" class="form-select" required>
+            <% branches.forEach(b=> { %>
+              <option value="<%= b._id %>" <%=room.branchId && room.branchId.toString()===b._id.toString() ? 'selected'
+                : '' %>>
+                <%= b.name %>
+              </option>
+              <% }) %>
+          </select>
+        </div>
+
+        <!-- Room Type -->
+        <div class="mb-3">
+          <label class="form-label">Room Type</label>
+          <select name="type" class="form-select" required>
+            <% const types=["Single", "Double" , "3-Seater" , "4-Seater" , "5-Seater" , "6-Seater" , "7-Seater" ]; %>
+              <% types.forEach(t=> { %>
+                <option value="<%= t %>" <%=room.type===t ? 'selected' : '' %>><%= t %>
+                </option>
+                <% }) %>
+          </select>
+        </div>
+
+        <!-- Capacity -->
+        <div class="mb-3">
+          <label class="form-label">Capacity</label>
+          <input type="number" name="capacity" class="form-control" value="<%= room.capacity %>" required>
+        </div>
+
+        <!-- Facilities -->
+        <div class="mb-3">
+          <label class="form-label">Facilities (comma separated)</label>
+          <input type="text" name="facilities" class="form-control" value="<%= room.facilities.join(', ') %>">
+        </div>
+
+        <!-- Price -->
+        <div class="mb-3">
+          <label class="form-label">Price (PKR)</label>
+          <input type="number" name="price" class="form-control" value="<%= room.price %>" required>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Update Room</button>
+      </div>
+
+    </form>
+
+  </div>
+</div>

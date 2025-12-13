@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    <%= pageTitle %>
+  </title>
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+
+  <!-- Tailwind (for spacing + flex utilities only) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" />
+
+  <!-- GLOBAL ADMIN LAYOUT FIX -->
+  <style>
+    body {
+      background: #f8f9fa !important;
+    }
+
+    /* ============================================ */
+    /* SIDEBAR BASE STYLING                         */
+    /* ============================================ */
+    #sidebar {
+      width: 250px;
+      min-width: 250px;
+      background: #0f172a;
+      /* dark navy */
+      color: #e2e8f0;
+      transition: 0.3s ease;
+    }
+
+    #sidebar ul {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      color: #cbd5e1;
+      font-size: 15px;
+      border-radius: 6px;
+      transition: 0.25s ease;
+    }
+
+    .sidebar-link:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+    }
+
+    .active-link {
+      background: #1e3a8a !important;
+      /* dark blue */
+      color: #fff !important;
+      font-weight: 600;
+    }
+
+    .active-link i {
+      color: #fff !important;
+    }
+
+    /* ============================================ */
+    /* MOBILE SIDEBAR (Drawer)                     */
+    /* ============================================ */
+    #sidebar {
+      position: fixed;
+      left: -250px;
+      top: 0;
+      bottom: 0;
+      z-index: 1000;
+    }
+
+    #sidebar.active {
+      left: 0;
+    }
+
+    #sidebarOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 900;
+    }
+
+    #sidebarOverlay.active {
+      display: block;
+    }
+
+    @media (min-width: 768px) {
+      #sidebar {
+        position: static !important;
+        left: 0 !important;
+      }
+    }
+
+    /* ============================================ */
+    /* PAGE LAYOUT                                  */
+    /* ============================================ */
+    .admin-wrapper {
+      display: flex;
+      flex-direction: row;
+      min-height: 100vh;
+    }
+
+    @media (max-width: 768px) {
+      .admin-wrapper {
+        flex-direction: column;
+      }
+    }
+  </style>
+
+</head>
+
+<body class="bg-light">
+
+  <!-- Overlay for Sidebar -->
+  <div id="sidebarOverlay"></div>
+
+  <!-- Mobile Header -->
+  <header class="md:hidden bg-white shadow-sm px-4 py-3 flex items-center justify-between">
+    <button id="mobileSidebarToggle" class="btn btn-outline-dark">
+      <i class="bi bi-list"></i>
+    </button>
+    <h1 class="text-lg font-semibold">
+      <%= pageTitle %>
+    </h1>
+    <div class="d-flex align-items-center gap-2">
+      <!-- Overdue Notification Bell -->
+      <div class="position-relative">
+        <button class="btn btn-link text-dark p-0" data-bs-toggle="modal" data-bs-target="#overdueModal"
+          id="overdueIconMobile">
+          <i class="bi bi-bell-fill fs-5"></i>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+            id="overdueBadgeMobile" style="display: none; font-size: 0.6rem;">
+            0
+          </span>
+        </button>
+      </div>
+      <i class="bi bi-person-circle fs-4 text-gray-600"></i>
+    </div>
+  </header>
+
+  <div class="admin-wrapper">

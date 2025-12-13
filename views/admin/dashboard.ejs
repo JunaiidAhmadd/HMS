@@ -1,0 +1,412 @@
+<%- include("partials/admin_header", { pageTitle: "Dashboard" }) %>
+
+  <style>
+    body {
+      background-color: #f8f9fa !important;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    .admin-wrapper {
+      display: flex;
+      width: 100%;
+    }
+
+    .flex-grow-1 {
+      width: 100%;
+    }
+
+    .table {
+      border-radius: 12px !important;
+      overflow: hidden !important;
+    }
+
+    .table-striped>tbody>tr:nth-of-type(odd)>* {
+      background-color: #f8f9fa !important;
+    }
+
+    .table-hover tbody tr:hover td {
+      background-color: #eef2ff !important;
+    }
+
+    /* =============== STATS CARDS =============== */
+    .overview-card {
+      border-radius: 10px;
+      padding: 1.3rem;
+      text-align: center;
+      border: 1px solid #e2e2e2;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.07);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      color: #fff;
+    }
+
+    .overview-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+    }
+
+    .overview-card i {
+      font-size: 2rem;
+      margin-bottom: .35rem;
+    }
+
+    .overview-card h6 {
+      margin-top: .2rem;
+      font-size: .8rem;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .overview-card .card-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .overview-card--branches {
+      background: linear-gradient(135deg, #0d6efd, #4dabff);
+    }
+
+    .overview-card--rooms {
+      background: linear-gradient(135deg, #6610f2, #a970ff);
+    }
+
+    .overview-card--bookings {
+      background: linear-gradient(135deg, #fd7e14, #ffb067);
+    }
+
+    .overview-card--pending {
+      background: linear-gradient(135deg, #6c757d, #aeb5bc);
+    }
+
+    /* =============== TABLE =============== */
+    .table th {
+      background: #1a1d23;
+      color: white;
+      font-size: .85rem;
+      text-transform: uppercase;
+    }
+
+    /* Show desktop table only above 768px */
+    @media (min-width: 768px) {
+      .desktop-table {
+        display: block !important;
+      }
+
+      .mobile-list {
+        display: none !important;
+      }
+    }
+
+    /* Show mobile list only on small screens */
+    @media (max-width: 767px) {
+      .desktop-table {
+        display: none !important;
+      }
+
+      .mobile-list {
+        display: block !important;
+      }
+    }
+
+    /* =============== MOBILE CARD DESIGN =============== */
+    .mobile-item {
+      background: white;
+      padding: 1.2rem;
+      border-radius: 10px;
+      border: 1px solid #e3e3e3;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    }
+
+    .mobile-item strong {
+      font-size: 1.05rem;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .mobile-item button {
+      margin-top: 10px;
+    }
+
+    /* =============== SEARCH =============== */
+    .search-bar input {
+      padding: .65rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #d1d1d1;
+      width: 100%;
+    }
+  </style>
+
+
+  <div class="admin-wrapper">
+
+    <!-- SIDEBAR -->
+    <%- include("partials/admin_sidebar", { activePage: "dashboard" }) %>
+
+      <!-- MAIN CONTENT -->
+      <div class="flex-grow-1">
+
+        <!-- HEADER (DESKTOP) -->
+        <header class="d-none d-md-flex justify-content-between bg-white py-3 px-4 shadow-sm">
+          <h5 class="fw-bold">Dashboard</h5>
+          <div class="d-flex align-items-center gap-3">
+            <!-- Overdue Notification Bell -->
+            <div class="position-relative">
+              <button class="btn btn-link text-dark p-0" data-bs-toggle="modal" data-bs-target="#overdueModal"
+                id="overdueIcon">
+                <i class="bi bi-bell-fill fs-4"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                  id="overdueBadge" style="display: none;">
+                  0
+                </span>
+              </button>
+            </div>
+            <span>Admin</span>
+            <i class="bi bi-person-circle fs-4"></i>
+          </div>
+        </header>
+
+        <main class="p-4">
+
+          <!-- ========== STATS CARDS ========== -->
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+              <a href="/admin/branches" class="text-decoration-none">
+                <div class="overview-card overview-card--branches">
+                  <i class="bi bi-building"></i>
+                  <h6>Branches</h6>
+                  <div class="card-value">
+                    <%= stats.branches %>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-6 col-md-3">
+              <a href="/admin/rooms" class="text-decoration-none">
+                <div class="overview-card overview-card--rooms">
+                  <i class="bi bi-door-open"></i>
+                  <h6>Rooms</h6>
+                  <div class="card-value">
+                    <%= stats.rooms %>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-6 col-md-3">
+              <a href="/admin/reservations" class="text-decoration-none">
+                <div class="overview-card overview-card--bookings">
+                  <i class="bi bi-journal-text"></i>
+                  <h6>Bookings</h6>
+                  <div class="card-value">
+                    <%= stats.bookings %>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-6 col-md-3">
+              <a href="/admin/reservations" class="text-decoration-none">
+                <div class="overview-card overview-card--pending">
+                  <i class="bi bi-clock-history"></i>
+                  <h6>Pending</h6>
+                  <div class="card-value">
+                    <%= stats.pending %>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+      <!-- ========== SEARCH ========== -->
+      <div class="search-bar mb-3">
+        <input id="searchInput" type="text" placeholder="Search by email..." onkeyup="filterList()">
+      </div>
+
+      <!-- ========== TABLE CARD ========== -->
+      <div class="card shadow-sm rounded-3">
+
+        <!-- DESKTOP TABLE -->
+        <div class="table-responsive desktop-table">
+          <table class="table table-striped table-hover align-middle mb-0"
+            style="border-radius: 12px; overflow:hidden;">
+
+            <thead style="background:#1b1e24; color:white;">
+              <tr>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Branch</th>
+                <th>Room</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th class="text-center">View</th>
+              </tr>
+            </thead>
+
+            <tbody id="tableBody">
+              <% recentBookings.forEach(r=> { %>
+
+                <tr data-email="<%= r.email.toLowerCase() %>">
+
+                  <!-- EMAIL -->
+                  <td>
+                    <%= r.email %>
+                  </td>
+
+                  <!-- NAME -->
+                  <td>
+                    <%= r.fullName %>
+                  </td>
+
+                  <!-- BRANCH -->
+                  <td>
+                    <%= r.branch?.name || "Unknown" %>
+                  </td>
+
+                  <!-- ROOM -->
+                  <td>
+                    <%= r.roomType %>
+                  </td>
+
+                  <!-- STATUS -->
+                  <td>
+                    <span class="badge 
+              <%= r.status === 'Approved' ? 'bg-success' :
+                  r.status === 'Rejected' ? 'bg-danger' : 'bg-warning text-dark' %>">
+                      <%= r.status %>
+                    </span>
+                  </td>
+
+                  <!-- DATE -->
+                  <td>
+                    <%= r.createdAt.toLocaleDateString() %>
+                  </td>
+
+                  <!-- VIEW BUTTON -->
+                  <td class="text-center">
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-<%= r._id %>">
+                      View
+                    </button>
+                  </td>
+                </tr>
+
+                <% }) %>
+            </tbody>
+          </table>
+        </div>
+
+
+        <!-- MOBILE LIST -->
+        <div class="d-block d-md-none">
+          <table class="table table-bordered">
+            <thead class="bg-primary text-white">
+              <tr>
+                <th scope="col">Full Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% recentBookings.forEach(r=> { %>
+                <tr data-fullName="<%= r.fullName.toLowerCase() %>">
+                  <td>
+                    <button class="btn btn-sm w-100 text-start" data-bs-toggle="modal"
+                      data-bs-target="#modal-<%= r._id %>">
+                      <strong>
+                        <%= r.fullName %>
+                      </strong>
+                    </button>
+                  </td>
+                </tr>
+                <% }) %>
+            </tbody>
+          </table>
+        </div>
+
+
+
+
+
+      </div>
+
+      <!-- ========== POPUP FOR MOBILE+DESKTOP (both same modal) ========== -->
+      <% recentBookings.forEach(r=> { %>
+
+        <div class="modal fade" id="modal-<%= r._id %>" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+              <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title">Booking Details</h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+              </div>
+
+              <div class="modal-body">
+
+                <p><strong>Booking ID:</strong>
+                  <%= r.bookingId %>
+                </p>
+                <p><strong>Name:</strong>
+                  <%= r.fullName %>
+                </p>
+                <p><strong>Email:</strong>
+                  <%= r.email %>
+                </p>
+                <p><strong>Branch:</strong>
+                  <%= r.branch?.name %>
+                </p>
+                <p><strong>Room Type:</strong>
+                  <%= r.roomType %>
+                </p>
+                <p><strong>Status:</strong>
+                  <%= r.status %>
+                </p>
+                <p><strong>Date:</strong>
+                  <%= r.createdAt.toLocaleDateString() %>
+                </p>
+
+                <% if (r.occupation==="Student" ) { %>
+                  <p><strong>Student ID:</strong>
+                    <%= r.studentId %>
+                  </p>
+                  <p><strong>Semester:</strong>
+                    <%= r.semester %>
+                  </p>
+                  <p><strong>Institute:</strong>
+                    <%= r.institute %>
+                  </p>
+                  <% } %>
+
+              </div>
+
+              <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <% }) %>
+
+          </main>
+
+  </div>
+
+  </div>
+
+
+  <script>
+    function filterList() {
+      let q = document.getElementById("searchInput").value.toLowerCase();
+
+      document.querySelectorAll("[data-email]").forEach(el => {
+        let email = el.dataset.email;
+        el.style.display = email.includes(q) ? "" : "none";
+      });
+    }
+  </script>
+
+  <%- include("partials/overdue_modal") %>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -1,0 +1,106 @@
+<nav id="sidebar">
+
+  <div class="px-4 py-4 border-b border-gray-700 flex items-center justify-between">
+    <span class="fw-bold text-lg">Admin Panel</span>
+
+    <button id="closeSidebarBtn" class="btn btn-light btn-sm md:hidden">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <ul class="mt-3 px-2">
+
+    <li class="my-1">
+      <a href="/admin/dashboard" class="sidebar-link <%= activePage === 'dashboard' ? 'active-link' : '' %>">
+        <i class="bi bi-speedometer2"></i> Dashboard
+      </a>
+    </li>
+
+    <li class="my-1">
+      <a href="/admin/branches" class="sidebar-link <%= activePage === 'branches' ? 'active-link' : '' %>">
+        <i class="bi bi-building"></i> Branches
+      </a>
+    </li>
+
+    <li class="my-1">
+      <a href="/admin/rooms" class="sidebar-link <%= activePage === 'rooms' ? 'active-link' : '' %>">
+        <i class="bi bi-door-open"></i> Rooms
+      </a>
+    </li>
+
+    <li class="my-1">
+      <a href="/admin/reservations" class="sidebar-link <%= activePage === 'reservations' ? 'active-link' : '' %>">
+        <i class="bi bi-journal-check"></i> Reservations
+      </a>
+    </li>
+
+    <li class="my-1">
+      <a href="/admin/users" class="sidebar-link <%= activePage === 'users' ? 'active-link' : '' %>">
+        <i class="bi bi-people"></i> Users
+      </a>
+    </li>
+
+    <li class="my-1 mb-4">
+      <a href="/admin/residents" class="sidebar-link <%= activePage === 'residents' ? 'active-link' : '' %>">
+        <i class="bi bi-house-door"></i> Residents & Rent
+      </a>
+    </li>
+
+    <!-- Finance Section -->
+    <li class="my-1">
+      <span class="text-uppercase small" style="color: #ffffff; opacity: 0.8;">Finance</span>
+    </li>
+
+    <li class="my-1">
+      <a href="/admin/reports/finance" class="sidebar-link <%= activePage === 'finance' ? 'active-link' : '' %>">
+        <i class="bi bi-bar-chart"></i> Overview
+      </a>
+    </li>
+
+    <li class="my-1 mb-4">
+      <a href="/admin/expenses/manage" class="sidebar-link <%= activePage === 'expenses' ? 'active-link' : '' %>">
+        <i class="bi bi-cash"></i> Expenses
+      </a>
+    </li>
+
+    <li class="my-1">
+      <a href="/admin/change-password" class="sidebar-link <%= activePage === 'settings' ? 'active-link' : '' %>">
+        <i class="bi bi-key"></i> Change Password
+      </a>
+    </li>
+
+    <li class="my-1">
+      <a href="/admin/logout" class="sidebar-link">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </a>
+    </li>
+    
+
+  </ul>
+</nav>
+
+<script>
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebarOverlay");
+  const openBtn = document.getElementById("mobileSidebarToggle");
+  const closeBtn = document.getElementById("closeSidebarBtn");
+
+  if (openBtn) {
+    openBtn.addEventListener("click", () => {
+      sidebar.classList.add("active");
+      overlay.classList.add("active");
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      sidebar.classList.remove("active");
+      overlay.classList.remove("active");
+    });
+  }
+
+  overlay.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+  });
+</script>

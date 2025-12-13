@@ -1,0 +1,105 @@
+/*
+ * style.css
+ *
+ * This stylesheet contains a few custom styles that extend Bootstrap
+ * and Tailwind utility classes. The aim is to create a unified look
+ * across the user and admin interfaces while keeping the markup
+ * clean. Feel free to modify the CSS variables below to tweak
+ * colours and spacing.
+ */
+
+:root {
+  --primary: #3b82f6; /* Tailwind blue-500 */
+  --secondary: #f3f4f6; /* Tailwind gray-100 */
+  --dark: #1f2937; /* Tailwind gray-800 */
+  --light: #ffffff;
+}
+
+body {
+  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--secondary);
+  color: var(--dark);
+}
+
+/* Hero section styles */
+.hero-section {
+  background-image: url('../images/hero.png');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  color: var(--light);
+  min-height: 70vh;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Card customisations */
+.room-card img {
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Admin sidebar */
+#sidebar {
+  width: 250px;
+  transition: width 0.3s ease;
+  background-color: var(--dark);
+  min-height: 100vh;
+  color: var(--light);
+}
+
+#sidebar.collapsed {
+  width: 60px;
+}
+
+#sidebar a {
+  color: var(--light);
+  display: block;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+#sidebar a:hover, #sidebar a.active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-header {
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 1rem;
+}
+
+/* Collapsed sidebar tooltips */
+#sidebar.collapsed a span {
+  display: none;
+}
+
+/* Success modal text */
+.modal-success .modal-content {
+  background-color: var(--light);
+  border-radius: 0.5rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+.modal-success .modal-header {
+  border-bottom: none;
+}
+
+.modal-success .modal-footer {
+  border-top: none;
+}

@@ -1,0 +1,75 @@
+<!-- ADD ROOM MODAL -->
+<div class="modal fade" id="addRoomModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form action="/admin/rooms/create" method="POST" class="modal-content" enctype="multipart/form-data">
+
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Add Room</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Branch Dropdown -->
+        <div class="mb-3">
+          <label class="form-label">Branch</label>
+          <select name="branchId" class="form-control" required>
+            <option value="">Select Branch</option>
+
+            <% branches.forEach(b=> { %>
+              <option value="<%= b._id %>">
+                <%= b.name %>
+              </option>
+              <% }) %>
+
+          </select>
+        </div>
+
+        <!-- Room Type -->
+        <div class="mb-3">
+          <label class="form-label">Room Type</label>
+          <select name="type" class="form-control" required>
+            <option>Single</option>
+            <option>Double</option>
+            <option>3-Seater</option>
+            <option>4-Seater</option>
+            <option>5-Seater</option>
+            <option>6-Seater</option>
+            <option>7-Seater</option>
+          </select>
+        </div>
+
+        <!-- Capacity -->
+        <div class="mb-3">
+          <label class="form-label">Capacity</label>
+          <input type="number" name="capacity" class="form-control" required min="1">
+        </div>
+
+        <!-- Facilities -->
+        <div class="mb-3">
+          <label class="form-label">Facilities (comma separated)</label>
+          <input type="text" name="facilities" class="form-control">
+        </div>
+
+        <!-- Price -->
+        <div class="mb-3">
+          <label class="form-label">Price (PKR)</label>
+          <input type="number" name="price" class="form-control" required min="0">
+        </div>
+
+        <!-- Images -->
+        <div class="mb-3">
+          <label class="form-label">Room Images</label>
+          <input type="file" name="images" class="form-control" multiple>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary">Add Room</button>
+      </div>
+
+    </form>
+  </div>
+</div>

@@ -1,0 +1,157 @@
+<%- include("partials/user_header", { pageTitle: "Room Details – Hostel Management" }) %>
+
+  <body class="d-flex flex-column min-vh-100">
+
+    <!-- Navbar -->
+    <%- include("partials/user_navbar") %>
+
+      <div class="container py-5">
+
+        <h1 class="text-3xl font-semibold mb-4">
+          <i class="bi bi-door-open me-2"></i>
+          <%= room.roomType %> Room Details
+        </h1>
+
+        <div class="row g-4">
+
+          <!-- Left Column: Image Carousel -->
+          <div class="col-lg-7">
+            <div id="roomCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+              <div class="carousel-inner rounded shadow-lg">
+                <% if (room.images && room.images.length> 0) { %>
+                  <% room.images.forEach((img, index)=> { %>
+                    <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                      <img src="<%= img %>" class="d-block w-100 carousel-room-img" alt="Room Image">
+                    </div>
+                    <% }) %>
+                      <% } else { %>
+                        <div class="carousel-item active">
+                          <img src="/images/room.png" class="d-block w-100 carousel-room-img" alt="Placeholder Image">
+                        </div>
+                        <% } %>
+              </div>
+
+              <% if (room.images && room.images.length> 1) { %>
+                <button class="carousel-control-prev" type="button" data-bs-target="#roomCarousel" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#roomCarousel" data-bs-slide="next">
+                  <span class="carousel-control-next-icon"></span>
+                </button>
+                <% } %>
+            </div>
+
+            <!-- Facilities Section (Moved here for better flow) -->
+            <div class="p-4 bg-white rounded shadow-sm border">
+              <h2 class="text-xl font-semibold mb-3">Amenities & Facilities</h2>
+              <div class="row g-4">
+                <!-- Room Amenities -->
+                <div class="col-md-6">
+                  <h5 class="text-muted text-uppercase small fw-bold mb-2">
+                    <i class="bi bi-house-door me-1"></i> Room Amenities
+                  </h5>
+                  <% if (room.facilities && room.facilities.length> 0) { %>
+                    <div class="d-flex flex-wrap gap-2">
+                      <% room.facilities.forEach(f=> { %>
+                        <span class="badge bg-light text-dark border px-2 py-1 rounded-pill">
+                          <i class="bi bi-check2-circle text-success me-1"></i>
+                          <%= f %>
+                        </span>
+                        <% }) %>
+                    </div>
+                    <% } else { %>
+                      <small class="text-muted fst-italic">No specific amenities.</small>
+                      <% } %>
+                </div>
+
+                <!-- Branch Facilities -->
+                <div class="col-md-6">
+                  <h5 class="text-muted text-uppercase small fw-bold mb-2">
+                    <i class="bi bi-building me-1"></i> Building Facilities
+                  </h5>
+                  <% if (room.branch && room.branch.facilities && room.branch.facilities.length> 0) { %>
+                    <div class="d-flex flex-wrap gap-2">
+                      <% room.branch.facilities.forEach(f=> { %>
+                        <span class="badge bg-light text-primary border px-2 py-1 rounded-pill">
+                          <i class="bi bi-stars me-1"></i>
+                          <%= f %>
+                        </span>
+                        <% }) %>
+                    </div>
+                    <% } else { %>
+                      <small class="text-muted fst-italic">No building facilities.</small>
+                      <% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Pricing & Reserve -->
+          <div class="col-lg-5">
+            <div class="p-4 bg-white rounded shadow-sm border sticky-top" style="top: 20px; z-index: 1;">
+              <h2 class="text-2xl font-semibold mb-3">Booking Summary</h2>
+
+              <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                <span class="text-muted">Monthly Rent</span>
+                <span class="fs-4 fw-bold text-primary">PKR <%= room.price.toLocaleString() %></span>
+              </div>
+
+              <div class="mb-3">
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted"><i class="bi bi-people me-2"></i>Capacity</span>
+                  <span class="fw-semibold">
+                    <%= room.capacity %> Occupants
+                  </span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span class="text-muted"><i class="bi bi-geo-alt me-2"></i>Branch</span>
+                  <span class="fw-semibold">
+                    <%= room.branch.name %>
+                  </span>
+                </div>
+              </div>
+
+              <div class="alert alert-info small mb-4">
+                <i class="bi bi-info-circle me-1"></i>
+                Includes electricity, water, and internet charges.
+              </div>
+
+              <a href="/user/reservation?branch=<%= room.branch._id %>&room=<%= room.roomType %>"
+                class="btn btn-primary fw-bold w-100 py-2 mb-3">
+                Reserve Now
+              </a>
+
+              <a href="/user/branch?id=<%= room.branch._id %>" class="btn btn-outline-secondary w-100 py-2">
+                Back to Branch
+              </a>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <%- include("partials/user_footer") %>
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Responsive Image Styling -->
+        <style>
+          .carousel-room-img {
+            height: 400px;
+            object-fit: cover;
+          }
+
+          @media (max-width: 768px) {
+            .carousel-room-img {
+              height: 200px;
+            }
+          }
+        </style>
+
+  </body>
+
+  </html>

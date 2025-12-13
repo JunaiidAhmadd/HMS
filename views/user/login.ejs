@@ -1,0 +1,31 @@
+<%- include("partials/user_header", { pageTitle: "User Login" }) %>
+
+<body class="d-flex justify-content-center align-items-center vh-100 bg-light">
+
+  <div class="card shadow p-4" style="width: 420px;">
+    <h3 class="text-center mb-3">User Login</h3>
+
+    <form method="POST" action="/user/login">
+
+      <div class="mb-3">
+        <label>Email</label>
+        <input class="form-control" name="email" type="email" required>
+      </div>
+
+      <div class="mb-3">
+        <label>Password</label>
+        <input class="form-control" name="password" type="password" required>
+      </div>
+
+      <button class="btn btn-primary w-100">Login</button>
+
+    </form>
+
+    <div class="text-center mt-3">
+      <a href="/user/register">Create a new user account</a>
+    </div>
+
+  </div>
+
+</body>
+</html>

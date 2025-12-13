@@ -1,0 +1,94 @@
+<!-- Overdue Rent Modal -->
+<div class="modal fade" id="overdueModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Overdue Rent Payments
+                </h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+
+                <div id="overdueLoading" class="text-center my-3">
+                    <div class="spinner-border text-primary"></div>
+                </div>
+
+                <table class="table table-sm" id="overdueTable" style="display:none;">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Branch</th>
+                            <th>Room</th>
+                            <th>Rent</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="overdueTableBody"></tbody>
+                </table>
+
+                <p id="noOverdueMessage" class="text-center text-muted" style="display:none;">
+                    <i class="bi bi-check-circle fs-2"></i><br>No overdue payments
+                </p>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function loadOverdueList() {
+    try {
+        const res = await fetch("/admin/residents/overdue/list", {
+            headers: { "Accept": "application/json" }
+        });
+
+        const data = await res.json();
+
+        const table = document.getElementById("overdueTable");
+        const tbody = document.getElementById("overdueTableBody");
+        const loading = document.getElementById("overdueLoading");
+        const noMsg = document.getElementById("noOverdueMessage");
+
+        loading.style.display = "none";
+        tbody.innerHTML = "";
+
+        if (!data.overdue || data.overdue.length === 0) {
+            noMsg.style.display = "block";
+            table.style.display = "none";
+            return;
+        }
+
+        noMsg.style.display = "none";
+        table.style.display = "table";
+
+        data.overdue.forEach(o => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${o.userName}</td>
+                    <td>${o.branchName}</td>
+                    <td>${o.roomType}</td>
+                    <td>PKR ${o.rentAmount}</td>
+                    <td>
+                        <form method="POST" action="/admin/residents/overdue/mark-paid" class="d-inline">
+                            <input type="hidden" name="reservationId" value="${o.reservationId}">
+                            <input type="hidden" name="userId" value="${o.userId}">
+                            <input type="hidden" name="amount" value="${o.rentAmount}">
+                            <button class="btn btn-success btn-sm">
+                                <i class="bi bi-check"></i> Paid
+                            </button>
+                        </form>
+                    </td>
+                </tr>`;
+        });
+
+    } catch (err) {
+        console.error("Load overdue error:", err);
+        document.getElementById("noOverdueMessage").textContent = "Error loading data.";
+        document.getElementById("noOverdueMessage").style.display = "block";
+    }
+}
+
+document.getElementById("overdueModal")
+    .addEventListener("show.bs.modal", loadOverdueList);
+</script>
