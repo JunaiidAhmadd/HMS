@@ -6,7 +6,12 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const methodOverride = require("method-override");
 
-require("./utils/db");
+const connectDB = require("./utils/db");
+
+(async () => {
+  await connectDB();
+})();
+
 
 const app = express();
 
